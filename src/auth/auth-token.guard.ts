@@ -3,7 +3,7 @@ import type { Request } from 'express';
 import { AuthService } from './auth.service.js';
 
 export interface AuthenticatedRequest extends Request {
-  user: {
+  user?: {
     id: string;
     username: string;
   };
@@ -26,7 +26,7 @@ export class AuthTokenGuard implements CanActivate {
     return true;
   }
 
-  private getToken(request: Request) {
+  protected getToken(request: Request) {
     const authorization = request.header('authorization');
 
     if (!authorization?.startsWith('Token ')) {

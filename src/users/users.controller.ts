@@ -24,6 +24,10 @@ export class UsersController {
   @Get('user')
   @UseGuards(AuthTokenGuard)
   getCurrentUser(@CurrentUser() user: AuthenticatedRequest['user']) {
+    if (!user) {
+      throw new Error('Authenticated user is missing');
+    }
+
     return this.usersService.getCurrentUser(user.id);
   }
 
@@ -33,6 +37,10 @@ export class UsersController {
     @CurrentUser() user: AuthenticatedRequest['user'],
     @Body() updateUserDto: UpdateUserDto,
   ) {
+    if (!user) {
+      throw new Error('Authenticated user is missing');
+    }
+
     return this.usersService.updateCurrentUser(user.id, updateUserDto.user);
   }
 }
