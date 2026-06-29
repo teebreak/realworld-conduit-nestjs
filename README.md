@@ -25,7 +25,7 @@ pnpm prisma:migrate --name init
 pnpm start:dev
 ```
 
-The API listens on `http://localhost:3000/api`.
+The API listens on `http://localhost:${PORT}/api`.
 
 Implemented RealWorld user endpoints:
 
