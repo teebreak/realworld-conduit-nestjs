@@ -33,6 +33,9 @@ Implemented RealWorld user endpoints:
 - `POST /api/users/login`
 - `GET /api/user`
 - `PUT /api/user`
+- `GET /api/profiles/:username`
+- `POST /api/profiles/:username/follow`
+- `DELETE /api/profiles/:username/follow`
 
 ## Docker
 
