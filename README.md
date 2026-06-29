@@ -36,6 +36,18 @@ Implemented RealWorld user endpoints:
 - `GET /api/profiles/:username`
 - `POST /api/profiles/:username/follow`
 - `DELETE /api/profiles/:username/follow`
+- `GET /api/articles/feed`
+- `GET /api/articles`
+- `POST /api/articles`
+- `GET /api/articles/:slug`
+- `PUT /api/articles/:slug`
+- `DELETE /api/articles/:slug`
+- `GET /api/articles/:slug/comments`
+- `POST /api/articles/:slug/comments`
+- `DELETE /api/articles/:slug/comments/:id`
+- `POST /api/articles/:slug/favorite`
+- `DELETE /api/articles/:slug/favorite`
+- `GET /api/tags`
 
 ## Docker
 
@@ -43,6 +55,7 @@ Implemented RealWorld user endpoints:
 docker compose up --build
 ```
 
+The API container runs `prisma migrate deploy` before starting the Nest process.
 The API container reads `JWT_SECRET`, `JWT_EXPIRES_IN`, and `PORT` from `.env`.
 The Postgres container reads `POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD`
 from `.env`.
