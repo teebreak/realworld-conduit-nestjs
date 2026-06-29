@@ -1,4 +1,9 @@
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { Prisma } from '../../generated/prisma/client.js';
 import { AuthService } from '../auth/auth.service.js';
 import { PrismaService } from '../prisma/prisma.service.js';
@@ -43,9 +48,9 @@ export class UsersService {
     });
 
     if (!user || !(await this.authService.verifyPassword(user.passwordHash, input.password))) {
-      throw new UnprocessableEntityException({
+      throw new UnauthorizedException({
         errors: {
-          body: ['Email or password is invalid'],
+          credentials: ['invalid'],
         },
       });
     }
@@ -75,11 +80,11 @@ export class UsersService {
     }
 
     if (input.bio !== undefined) {
-      data.bio = input.bio;
+      data.bio = normalizeNullableText(input.bio);
     }
 
     if (input.image !== undefined) {
-      data.image = input.image;
+      data.image = normalizeNullableText(input.image);
     }
 
     try {
@@ -133,11 +138,11 @@ export class UsersService {
 
   private mapPrismaError(error: unknown): Error {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-      const fields = Array.isArray(error.meta?.target) ? error.meta.target : ['field'];
+      const fields = getUniqueConstraintFields(error);
 
-      return new UnprocessableEntityException({
+      return new ConflictException({
         errors: {
-          body: fields.map((field) => `${String(field)} is already taken`),
+          ...Object.fromEntries(fields.map((field) => [String(field), ['has already been taken']])),
         },
       });
     }
@@ -153,3 +158,31 @@ const publicUserSelect = {
   bio: true,
   image: true,
 } satisfies Prisma.UserSelect;
+
+function normalizeNullableText(value: string | null) {
+  return value === '' ? null : value;
+}
+
+function getUniqueConstraintFields(error: Prisma.PrismaClientKnownRequestError) {
+  const target = error.meta?.target;
+
+  if (Array.isArray(target)) {
+    return target.map(String);
+  }
+
+  if (typeof target === 'string') {
+    return [target];
+  }
+
+  const errorText = JSON.stringify(error);
+
+  if (errorText.includes('users_username_key')) {
+    return ['username'];
+  }
+
+  if (errorText.includes('users_email_key')) {
+    return ['email'];
+  }
+
+  return ['field'];
+}

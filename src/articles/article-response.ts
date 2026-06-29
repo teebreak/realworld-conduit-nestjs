@@ -3,9 +3,11 @@ export interface ArticleResponse {
 }
 
 export interface MultipleArticlesResponse {
-  articles: ArticleView[];
+  articles: ListedArticleView[];
   articlesCount: number;
 }
+
+export type ListedArticleView = Omit<ArticleView, 'body'>;
 
 export interface ArticleView {
   slug: string;

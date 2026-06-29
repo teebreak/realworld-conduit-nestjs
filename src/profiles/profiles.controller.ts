@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, HttpCode, Param, Post, UseGuards } from '@nestjs/common';
 import { AuthTokenGuard } from '../auth/auth-token.guard.js';
 import type { AuthenticatedRequest } from '../auth/auth-token.guard.js';
 import { CurrentUser } from '../auth/current-user.decorator.js';
@@ -19,6 +19,7 @@ export class ProfilesController {
   }
 
   @Post(':username/follow')
+  @HttpCode(200)
   @UseGuards(AuthTokenGuard)
   followProfile(
     @Param('username') username: string,

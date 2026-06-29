@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Put, UseGuards } from '@nestjs/common';
 import { CurrentUser } from '../auth/current-user.decorator.js';
 import { AuthTokenGuard } from '../auth/auth-token.guard.js';
 import type { AuthenticatedRequest } from '../auth/auth-token.guard.js';
@@ -17,6 +17,7 @@ export class UsersController {
   }
 
   @Post('users/login')
+  @HttpCode(200)
   loginUser(@Body() loginUserDto: LoginUserDto) {
     return this.usersService.loginUser(loginUserDto.user);
   }

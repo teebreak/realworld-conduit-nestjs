@@ -3,13 +3,15 @@ import { IsEmail, IsNotEmpty, IsString, MinLength, ValidateNested } from 'class-
 
 export class CreateUserInput {
   @IsString()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: "can't be blank" })
   username!: string;
 
   @IsEmail()
+  @IsNotEmpty({ message: "can't be blank" })
   email!: string;
 
   @IsString()
+  @IsNotEmpty({ message: "can't be blank" })
   @MinLength(8)
   password!: string;
 }

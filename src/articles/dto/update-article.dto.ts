@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsOptional, IsString, ValidateIf, ValidateNested } from 'class-validator';
 
 export class UpdateArticleInput {
   @IsOptional()
@@ -14,7 +14,7 @@ export class UpdateArticleInput {
   @IsString()
   body?: string;
 
-  @IsOptional()
+  @ValidateIf((_, value) => value !== undefined)
   @IsArray()
   @IsString({ each: true })
   tagList?: string[];

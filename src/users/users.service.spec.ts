@@ -1,4 +1,4 @@
-import { UnprocessableEntityException } from '@nestjs/common';
+import { UnauthorizedException } from '@nestjs/common';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { UsersService } from './users.service.js';
 
@@ -105,7 +105,7 @@ describe('UsersService', () => {
         email: 'jane@example.com',
         password: 'wrong-password',
       }),
-    ).rejects.toBeInstanceOf(UnprocessableEntityException);
+    ).rejects.toBeInstanceOf(UnauthorizedException);
   });
 
   it('returns the current user', async () => {

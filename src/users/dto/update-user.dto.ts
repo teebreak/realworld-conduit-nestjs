@@ -1,27 +1,38 @@
 import { Type } from 'class-transformer';
-import { IsEmail, IsOptional, IsString, MinLength, ValidateNested } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MinLength,
+  ValidateIf,
+  ValidateNested,
+} from 'class-validator';
 
 export class UpdateUserInput {
-  @IsOptional()
+  @ValidateIf((_, value) => value !== undefined)
   @IsEmail()
+  @IsNotEmpty({ message: "can't be blank" })
   email?: string;
 
-  @IsOptional()
+  @ValidateIf((_, value) => value !== undefined)
   @IsString()
+  @IsNotEmpty({ message: "can't be blank" })
   username?: string;
 
-  @IsOptional()
+  @ValidateIf((_, value) => value !== undefined)
   @IsString()
+  @IsNotEmpty({ message: "can't be blank" })
   @MinLength(8)
   password?: string;
 
   @IsOptional()
   @IsString()
-  bio?: string;
+  bio?: string | null;
 
   @IsOptional()
   @IsString()
-  image?: string;
+  image?: string | null;
 }
 
 export class UpdateUserDto {

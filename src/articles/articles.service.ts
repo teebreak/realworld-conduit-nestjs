@@ -11,6 +11,7 @@ import type {
   ArticleView,
   CommentResponse,
   CommentView,
+  ListedArticleView,
   MultipleArticlesResponse,
   MultipleCommentsResponse,
 } from './article-response.js';
@@ -43,7 +44,7 @@ export class ArticlesService {
 
     return {
       articles: await Promise.all(
-        articles.map((article) => this.toArticleView(article, currentUserId)),
+        articles.map((article) => this.toListedArticleView(article, currentUserId)),
       ),
       articlesCount,
     };
@@ -73,7 +74,9 @@ export class ArticlesService {
     ]);
 
     return {
-      articles: await Promise.all(articles.map((article) => this.toArticleView(article, userId))),
+      articles: await Promise.all(
+        articles.map((article) => this.toListedArticleView(article, userId)),
+      ),
       articlesCount,
     };
   }
@@ -82,7 +85,7 @@ export class ArticlesService {
     try {
       const article = await this.prisma.article.create({
         data: {
-          slug: slugify(input.title),
+          slug: await this.generateUniqueSlug(input.title),
           title: input.title,
           description: input.description,
           body: input.body,
@@ -120,7 +123,7 @@ export class ArticlesService {
 
     if (input.title !== undefined) {
       data.title = input.title;
-      data.slug = slugify(input.title);
+      data.slug = await this.generateUniqueSlug(input.title, article.id);
     }
 
     if (input.description !== undefined) {
@@ -372,6 +375,25 @@ export class ArticlesService {
     };
   }
 
+  private async toListedArticleView(
+    article: ArticleWithRelations,
+    currentUserId?: string,
+  ): Promise<ListedArticleView> {
+    const articleView = await this.toArticleView(article, currentUserId);
+
+    return {
+      slug: articleView.slug,
+      title: articleView.title,
+      description: articleView.description,
+      tagList: articleView.tagList,
+      createdAt: articleView.createdAt,
+      updatedAt: articleView.updatedAt,
+      favorited: articleView.favorited,
+      favoritesCount: articleView.favoritesCount,
+      author: articleView.author,
+    };
+  }
+
   private async toCommentView(
     comment: CommentWithRelations,
     currentUserId?: string,
@@ -443,6 +465,32 @@ export class ArticlesService {
         },
       })),
     };
+  }
+
+  private async generateUniqueSlug(title: string, ignoredArticleId?: string) {
+    const baseSlug = slugify(title);
+    let slug = baseSlug;
+    let suffix = 1;
+
+    while (await this.articleSlugExists(slug, ignoredArticleId)) {
+      suffix += 1;
+      slug = `${baseSlug}-${suffix}`;
+    }
+
+    return slug;
+  }
+
+  private async articleSlugExists(slug: string, ignoredArticleId?: string) {
+    const article = await this.prisma.article.findUnique({
+      where: {
+        slug,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    return Boolean(article && article.id !== ignoredArticleId);
   }
 
   private mapPrismaError(error: unknown): Error {

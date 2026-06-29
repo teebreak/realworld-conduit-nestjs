@@ -32,7 +32,7 @@ export class AuthTokenGuard implements CanActivate {
     if (!authorization?.startsWith('Token ')) {
       throw new UnauthorizedException({
         errors: {
-          body: ['Authorization token is required'],
+          token: ['is missing'],
         },
       });
     }
@@ -42,7 +42,7 @@ export class AuthTokenGuard implements CanActivate {
     if (!token) {
       throw new UnauthorizedException({
         errors: {
-          body: ['Authorization token is required'],
+          token: ['is missing'],
         },
       });
     }

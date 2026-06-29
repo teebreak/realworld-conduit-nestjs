@@ -3,7 +3,7 @@ import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
 
 export class CreateCommentInput {
   @IsString()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: "can't be blank" })
   body!: string;
 }
 

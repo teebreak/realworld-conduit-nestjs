@@ -64,7 +64,7 @@ export class ProfilesService {
     if (!profile) {
       throw new NotFoundException({
         errors: {
-          body: ['Profile not found'],
+          profile: ['not found'],
         },
       });
     }

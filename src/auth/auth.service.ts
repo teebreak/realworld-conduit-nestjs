@@ -29,7 +29,7 @@ export class AuthService {
     } catch {
       throw new UnauthorizedException({
         errors: {
-          body: ['Invalid authorization token'],
+          token: ['is invalid'],
         },
       });
     }

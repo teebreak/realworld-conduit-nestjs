@@ -74,12 +74,14 @@ export class ArticlesController {
   }
 
   @Post(':slug/favorite')
+  @HttpCode(200)
   @UseGuards(AuthTokenGuard)
   favoriteArticle(@Param('slug') slug: string, @CurrentUser() user: AuthenticatedRequest['user']) {
     return this.articlesService.favoriteArticle(slug, this.requireUserId(user));
   }
 
   @Delete(':slug/favorite')
+  @HttpCode(200)
   @UseGuards(AuthTokenGuard)
   unfavoriteArticle(
     @Param('slug') slug: string,

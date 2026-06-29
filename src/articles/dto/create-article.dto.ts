@@ -3,15 +3,15 @@ import { IsArray, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class
 
 export class CreateArticleInput {
   @IsString()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: "can't be blank" })
   title!: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: "can't be blank" })
   description!: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: "can't be blank" })
   body!: string;
 
   @IsOptional()
