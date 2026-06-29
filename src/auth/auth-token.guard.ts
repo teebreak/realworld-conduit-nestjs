@@ -1,5 +1,6 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import type { Request } from 'express';
+import { tokenMissingError } from '../common/realworld-errors.js';
 import { AuthService } from './auth.service.js';
 
 export interface AuthenticatedRequest extends Request {
@@ -30,21 +31,13 @@ export class AuthTokenGuard implements CanActivate {
     const authorization = request.header('authorization');
 
     if (!authorization?.startsWith('Token ')) {
-      throw new UnauthorizedException({
-        errors: {
-          token: ['is missing'],
-        },
-      });
+      throw tokenMissingError();
     }
 
     const token = authorization.slice('Token '.length).trim();
 
     if (!token) {
-      throw new UnauthorizedException({
-        errors: {
-          token: ['is missing'],
-        },
-      });
+      throw tokenMissingError();
     }
 
     return token;

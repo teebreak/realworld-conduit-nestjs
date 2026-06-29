@@ -2,6 +2,7 @@ import { Body, Controller, Get, HttpCode, Post, Put, UseGuards } from '@nestjs/c
 import { CurrentUser } from '../auth/current-user.decorator.js';
 import { AuthTokenGuard } from '../auth/auth-token.guard.js';
 import type { AuthenticatedRequest } from '../auth/auth-token.guard.js';
+import { requireAuthenticatedUser } from '../auth/authenticated-user.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { LoginUserDto } from './dto/login-user.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
@@ -25,11 +26,7 @@ export class UsersController {
   @Get('user')
   @UseGuards(AuthTokenGuard)
   getCurrentUser(@CurrentUser() user: AuthenticatedRequest['user']) {
-    if (!user) {
-      throw new Error('Authenticated user is missing');
-    }
-
-    return this.usersService.getCurrentUser(user.id);
+    return this.usersService.getCurrentUser(requireAuthenticatedUser(user).id);
   }
 
   @Put('user')
@@ -38,10 +35,9 @@ export class UsersController {
     @CurrentUser() user: AuthenticatedRequest['user'],
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    if (!user) {
-      throw new Error('Authenticated user is missing');
-    }
-
-    return this.usersService.updateCurrentUser(user.id, updateUserDto.user);
+    return this.usersService.updateCurrentUser(
+      requireAuthenticatedUser(user).id,
+      updateUserDto.user,
+    );
   }
 }

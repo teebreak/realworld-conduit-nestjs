@@ -1,6 +1,7 @@
 import { Controller, Delete, Get, HttpCode, Param, Post, UseGuards } from '@nestjs/common';
 import { AuthTokenGuard } from '../auth/auth-token.guard.js';
 import type { AuthenticatedRequest } from '../auth/auth-token.guard.js';
+import { requireAuthenticatedUser } from '../auth/authenticated-user.js';
 import { CurrentUser } from '../auth/current-user.decorator.js';
 import { OptionalAuthTokenGuard } from '../auth/optional-auth-token.guard.js';
 import { ProfilesService } from './profiles.service.js';
@@ -25,11 +26,7 @@ export class ProfilesController {
     @Param('username') username: string,
     @CurrentUser() user: AuthenticatedRequest['user'],
   ) {
-    if (!user) {
-      throw new Error('Authenticated user is missing');
-    }
-
-    return this.profilesService.followProfile(username, user.id);
+    return this.profilesService.followProfile(username, requireAuthenticatedUser(user).id);
   }
 
   @Delete(':username/follow')
@@ -38,10 +35,6 @@ export class ProfilesController {
     @Param('username') username: string,
     @CurrentUser() user: AuthenticatedRequest['user'],
   ) {
-    if (!user) {
-      throw new Error('Authenticated user is missing');
-    }
-
-    return this.profilesService.unfollowProfile(username, user.id);
+    return this.profilesService.unfollowProfile(username, requireAuthenticatedUser(user).id);
   }
 }

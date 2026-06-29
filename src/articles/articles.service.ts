@@ -1,10 +1,7 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-  UnprocessableEntityException,
-} from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { Prisma } from '../../generated/prisma/client.js';
+import { forbiddenError, notFoundError } from '../common/realworld-errors.js';
+import { slugify } from '../common/text.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import type {
   ArticleResponse,
@@ -278,11 +275,11 @@ export class ArticlesService {
     });
 
     if (!comment) {
-      throw this.notFound('comment');
+      throw notFoundError('comment');
     }
 
     if (comment.authorId !== userId) {
-      throw this.forbidden('comment');
+      throw forbiddenError('comment');
     }
 
     await this.prisma.comment.delete({
@@ -335,7 +332,7 @@ export class ArticlesService {
     });
 
     if (!article) {
-      throw this.notFound('article');
+      throw notFoundError('article');
     }
 
     return article;
@@ -343,7 +340,7 @@ export class ArticlesService {
 
   private assertArticleOwner(authorId: string, userId: string) {
     if (authorId !== userId) {
-      throw this.forbidden('article');
+      throw forbiddenError('article');
     }
   }
 
@@ -504,22 +501,6 @@ export class ArticlesService {
 
     return error instanceof Error ? error : new Error('Unexpected Prisma error');
   }
-
-  private forbidden(resource: string) {
-    return new ForbiddenException({
-      errors: {
-        [resource]: ['forbidden'],
-      },
-    });
-  }
-
-  private notFound(resource: string) {
-    return new NotFoundException({
-      errors: {
-        [resource]: ['not found'],
-      },
-    });
-  }
 }
 
 const articleInclude = {
@@ -561,13 +542,3 @@ type ArticleWithRelations = Prisma.ArticleGetPayload<{
 type CommentWithRelations = Prisma.CommentGetPayload<{
   include: typeof commentInclude;
 }>;
-
-function slugify(value: string) {
-  const slug = value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-
-  return slug || 'article';
-}

@@ -1,6 +1,7 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { hash, verify } from 'argon2';
+import { tokenInvalidError } from '../common/realworld-errors.js';
 
 export interface AuthTokenPayload {
   sub: string;
@@ -27,11 +28,7 @@ export class AuthService {
     try {
       return await this.jwtService.verifyAsync<AuthTokenPayload>(token);
     } catch {
-      throw new UnauthorizedException({
-        errors: {
-          token: ['is invalid'],
-        },
-      });
+      throw tokenInvalidError();
     }
   }
 }

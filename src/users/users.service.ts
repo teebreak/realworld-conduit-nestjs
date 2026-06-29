@@ -6,6 +6,8 @@ import {
 } from '@nestjs/common';
 import { Prisma } from '../../generated/prisma/client.js';
 import { AuthService } from '../auth/auth.service.js';
+import { getUniqueConstraintFields } from '../common/prisma-errors.js';
+import { normalizeNullableText } from '../common/text.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import type { CreateUserInput } from './dto/create-user.dto.js';
 import type { LoginUserInput } from './dto/login-user.dto.js';
@@ -158,31 +160,3 @@ const publicUserSelect = {
   bio: true,
   image: true,
 } satisfies Prisma.UserSelect;
-
-function normalizeNullableText(value: string | null) {
-  return value === '' ? null : value;
-}
-
-function getUniqueConstraintFields(error: Prisma.PrismaClientKnownRequestError) {
-  const target = error.meta?.target;
-
-  if (Array.isArray(target)) {
-    return target.map(String);
-  }
-
-  if (typeof target === 'string') {
-    return [target];
-  }
-
-  const errorText = JSON.stringify(error);
-
-  if (errorText.includes('users_username_key')) {
-    return ['username'];
-  }
-
-  if (errorText.includes('users_email_key')) {
-    return ['email'];
-  }
-
-  return ['field'];
-}

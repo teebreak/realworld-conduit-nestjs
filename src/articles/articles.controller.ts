@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { AuthTokenGuard } from '../auth/auth-token.guard.js';
 import type { AuthenticatedRequest } from '../auth/auth-token.guard.js';
+import { requireAuthenticatedUser } from '../auth/authenticated-user.js';
 import { CurrentUser } from '../auth/current-user.decorator.js';
 import { OptionalAuthTokenGuard } from '../auth/optional-auth-token.guard.js';
 import { ArticleQueryDto } from './dto/article-query.dto.js';
@@ -122,10 +123,6 @@ export class ArticlesController {
   }
 
   private requireUserId(user: AuthenticatedRequest['user']) {
-    if (!user) {
-      throw new Error('Authenticated user is missing');
-    }
-
-    return user.id;
+    return requireAuthenticatedUser(user).id;
   }
 }

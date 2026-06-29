@@ -1,4 +1,5 @@
-import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import { notFoundError } from '../common/realworld-errors.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import type { ProfileResponse, ProfileUser } from './profile-response.js';
 
@@ -62,11 +63,7 @@ export class ProfilesService {
     });
 
     if (!profile) {
-      throw new NotFoundException({
-        errors: {
-          profile: ['not found'],
-        },
-      });
+      throw notFoundError('profile');
     }
 
     return profile;
