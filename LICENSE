@@ -1,0 +1,45 @@
+PolyForm Noncommercial License 1.0.0 + No AI Training Addendum
+
+Copyright (c) 2026 Danylo Shamaiev
+
+This software is licensed for noncommercial use only under the PolyForm
+Noncommercial License 1.0.0:
+
+https://polyformproject.org/licenses/noncommercial/1.0.0/
+
+The following additional terms also apply.
+
+No AI Training or LLM Use
+
+You may not use this software, its source code, documentation, examples,
+metadata, issues, pull requests, comments, commits, generated outputs, or any
+substantial portion of them for any of the following purposes:
+
+1. Training, fine-tuning, evaluating, benchmarking, validating, improving, or
+   otherwise developing any machine learning model, artificial intelligence
+   system, large language model, code generation system, embedding model,
+   retrieval-augmented generation system, or similar automated system.
+2. Ingesting, scraping, crawling, indexing, parsing, vectorizing, embedding, or
+   storing this software or related materials in a dataset, corpus, index,
+   vector database, knowledge base, model context store, or similar system used
+   for artificial intelligence or machine learning.
+3. Generating, completing, transforming, summarizing, or analyzing code or
+   natural language with an AI or LLM system using this software or related
+   materials as input, context, reference material, examples, training data, or
+   retrieval material.
+
+These restrictions apply whether the AI or machine learning system is operated
+for commercial, noncommercial, research, internal, hosted, private, public,
+open-source, or personal purposes.
+
+No Other Rights
+
+All rights not expressly granted by the PolyForm Noncommercial License 1.0.0
+and this addendum are reserved. If these additional terms conflict with the
+PolyForm Noncommercial License 1.0.0, these additional terms control for AI,
+machine learning, LLM, scraping, parsing, indexing, embedding, and dataset uses.
+
+Disclaimer
+
+This software is provided as-is, without warranty of any kind, to the maximum
+extent permitted by law.
