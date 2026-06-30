@@ -8,10 +8,17 @@ import type {
   ArticleView,
   CommentResponse,
   CommentView,
-  ListedArticleView,
   MultipleArticlesResponse,
   MultipleCommentsResponse,
 } from './article-response.js';
+import {
+  articleInclude,
+  commentInclude,
+  toArticleView,
+  toCommentView,
+  toListedArticleView,
+} from './article-presenter.js';
+import type { ArticleWithRelations, CommentWithRelations } from './article-presenter.js';
 import type { ArticleQueryDto } from './dto/article-query.dto.js';
 import type { CreateArticleInput } from './dto/create-article.dto.js';
 import type { CreateCommentInput } from './dto/create-comment.dto.js';
@@ -353,42 +360,16 @@ export class ArticlesService {
       currentUserId ? this.isFavorited(currentUserId, article.id) : false,
     ]);
 
-    return {
-      slug: article.slug,
-      title: article.title,
-      description: article.description,
-      body: article.body,
-      tagList: article.articleTags.map((articleTag) => articleTag.tag.name),
-      createdAt: article.createdAt,
-      updatedAt: article.updatedAt,
+    return toArticleView(article, {
       favorited,
-      favoritesCount: article.favoritesCount,
-      author: {
-        username: article.author.username,
-        bio: article.author.bio,
-        image: article.author.image,
-        following,
-      },
-    };
+      followingAuthor: following,
+    });
   }
 
-  private async toListedArticleView(
-    article: ArticleWithRelations,
-    currentUserId?: string,
-  ): Promise<ListedArticleView> {
+  private async toListedArticleView(article: ArticleWithRelations, currentUserId?: string) {
     const articleView = await this.toArticleView(article, currentUserId);
 
-    return {
-      slug: articleView.slug,
-      title: articleView.title,
-      description: articleView.description,
-      tagList: articleView.tagList,
-      createdAt: articleView.createdAt,
-      updatedAt: articleView.updatedAt,
-      favorited: articleView.favorited,
-      favoritesCount: articleView.favoritesCount,
-      author: articleView.author,
-    };
+    return toListedArticleView(articleView);
   }
 
   private async toCommentView(
@@ -399,18 +380,9 @@ export class ArticlesService {
       ? await this.isFollowing(currentUserId, comment.authorId)
       : false;
 
-    return {
-      id: comment.id,
-      createdAt: comment.createdAt,
-      updatedAt: comment.updatedAt,
-      body: comment.body,
-      author: {
-        username: comment.author.username,
-        bio: comment.author.bio,
-        image: comment.author.image,
-        following,
-      },
-    };
+    return toCommentView(comment, {
+      followingAuthor: following,
+    });
   }
 
   private async isFollowing(followerId: string, followingId: string) {
@@ -502,43 +474,3 @@ export class ArticlesService {
     return error instanceof Error ? error : new Error('Unexpected Prisma error');
   }
 }
-
-const articleInclude = {
-  author: {
-    select: {
-      id: true,
-      username: true,
-      bio: true,
-      image: true,
-    },
-  },
-  articleTags: {
-    include: {
-      tag: true,
-    },
-    orderBy: {
-      tag: {
-        name: 'asc',
-      },
-    },
-  },
-} satisfies Prisma.ArticleInclude;
-
-const commentInclude = {
-  author: {
-    select: {
-      id: true,
-      username: true,
-      bio: true,
-      image: true,
-    },
-  },
-} satisfies Prisma.CommentInclude;
-
-type ArticleWithRelations = Prisma.ArticleGetPayload<{
-  include: typeof articleInclude;
-}>;
-
-type CommentWithRelations = Prisma.CommentGetPayload<{
-  include: typeof commentInclude;
-}>;
