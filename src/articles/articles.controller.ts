@@ -13,8 +13,9 @@ import {
 } from '@nestjs/common';
 import { AuthTokenGuard } from '../auth/auth-token.guard.js';
 import type { AuthenticatedRequest } from '../auth/auth-token.guard.js';
-import { requireAuthenticatedUser } from '../auth/authenticated-user.js';
+import type { AuthenticatedUser } from '../auth/authenticated-user.js';
 import { CurrentUser } from '../auth/current-user.decorator.js';
+import { RequiredUser } from '../auth/required-user.decorator.js';
 import { OptionalAuthTokenGuard } from '../auth/optional-auth-token.guard.js';
 import { ArticleQueryDto } from './dto/article-query.dto.js';
 import { CreateArticleDto } from './dto/create-article.dto.js';
@@ -28,8 +29,8 @@ export class ArticlesController {
 
   @Get('feed')
   @UseGuards(AuthTokenGuard)
-  getFeed(@Query() query: ArticleQueryDto, @CurrentUser() user: AuthenticatedRequest['user']) {
-    return this.articlesService.getFeed(this.requireUserId(user), query);
+  getFeed(@Query() query: ArticleQueryDto, @RequiredUser() user: AuthenticatedUser) {
+    return this.articlesService.getFeed(user.id, query);
   }
 
   @Get()
@@ -42,9 +43,9 @@ export class ArticlesController {
   @UseGuards(AuthTokenGuard)
   createArticle(
     @Body() createArticleDto: CreateArticleDto,
-    @CurrentUser() user: AuthenticatedRequest['user'],
+    @RequiredUser() user: AuthenticatedUser,
   ) {
-    return this.articlesService.createArticle(this.requireUserId(user), createArticleDto.article);
+    return this.articlesService.createArticle(user.id, createArticleDto.article);
   }
 
   @Get(':slug')
@@ -58,37 +59,30 @@ export class ArticlesController {
   updateArticle(
     @Param('slug') slug: string,
     @Body() updateArticleDto: UpdateArticleDto,
-    @CurrentUser() user: AuthenticatedRequest['user'],
+    @RequiredUser() user: AuthenticatedUser,
   ) {
-    return this.articlesService.updateArticle(
-      slug,
-      this.requireUserId(user),
-      updateArticleDto.article,
-    );
+    return this.articlesService.updateArticle(slug, user.id, updateArticleDto.article);
   }
 
   @Delete(':slug')
   @HttpCode(204)
   @UseGuards(AuthTokenGuard)
-  deleteArticle(@Param('slug') slug: string, @CurrentUser() user: AuthenticatedRequest['user']) {
-    return this.articlesService.deleteArticle(slug, this.requireUserId(user));
+  deleteArticle(@Param('slug') slug: string, @RequiredUser() user: AuthenticatedUser) {
+    return this.articlesService.deleteArticle(slug, user.id);
   }
 
   @Post(':slug/favorite')
   @HttpCode(200)
   @UseGuards(AuthTokenGuard)
-  favoriteArticle(@Param('slug') slug: string, @CurrentUser() user: AuthenticatedRequest['user']) {
-    return this.articlesService.favoriteArticle(slug, this.requireUserId(user));
+  favoriteArticle(@Param('slug') slug: string, @RequiredUser() user: AuthenticatedUser) {
+    return this.articlesService.favoriteArticle(slug, user.id);
   }
 
   @Delete(':slug/favorite')
   @HttpCode(200)
   @UseGuards(AuthTokenGuard)
-  unfavoriteArticle(
-    @Param('slug') slug: string,
-    @CurrentUser() user: AuthenticatedRequest['user'],
-  ) {
-    return this.articlesService.unfavoriteArticle(slug, this.requireUserId(user));
+  unfavoriteArticle(@Param('slug') slug: string, @RequiredUser() user: AuthenticatedUser) {
+    return this.articlesService.unfavoriteArticle(slug, user.id);
   }
 
   @Get(':slug/comments')
@@ -102,13 +96,9 @@ export class ArticlesController {
   createComment(
     @Param('slug') slug: string,
     @Body() createCommentDto: CreateCommentDto,
-    @CurrentUser() user: AuthenticatedRequest['user'],
+    @RequiredUser() user: AuthenticatedUser,
   ) {
-    return this.articlesService.createComment(
-      slug,
-      this.requireUserId(user),
-      createCommentDto.comment,
-    );
+    return this.articlesService.createComment(slug, user.id, createCommentDto.comment);
   }
 
   @Delete(':slug/comments/:id')
@@ -117,12 +107,8 @@ export class ArticlesController {
   deleteComment(
     @Param('slug') slug: string,
     @Param('id', ParseIntPipe) id: number,
-    @CurrentUser() user: AuthenticatedRequest['user'],
+    @RequiredUser() user: AuthenticatedUser,
   ) {
-    return this.articlesService.deleteComment(slug, id, this.requireUserId(user));
-  }
-
-  private requireUserId(user: AuthenticatedRequest['user']) {
-    return requireAuthenticatedUser(user).id;
+    return this.articlesService.deleteComment(slug, id, user.id);
   }
 }

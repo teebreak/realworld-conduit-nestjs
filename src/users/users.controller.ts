@@ -1,8 +1,7 @@
 import { Body, Controller, Get, HttpCode, Post, Put, UseGuards } from '@nestjs/common';
-import { CurrentUser } from '../auth/current-user.decorator.js';
 import { AuthTokenGuard } from '../auth/auth-token.guard.js';
-import type { AuthenticatedRequest } from '../auth/auth-token.guard.js';
-import { requireAuthenticatedUser } from '../auth/authenticated-user.js';
+import type { AuthenticatedUser } from '../auth/authenticated-user.js';
+import { RequiredUser } from '../auth/required-user.decorator.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { LoginUserDto } from './dto/login-user.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
@@ -25,19 +24,13 @@ export class UsersController {
 
   @Get('user')
   @UseGuards(AuthTokenGuard)
-  getCurrentUser(@CurrentUser() user: AuthenticatedRequest['user']) {
-    return this.usersService.getCurrentUser(requireAuthenticatedUser(user).id);
+  getCurrentUser(@RequiredUser() user: AuthenticatedUser) {
+    return this.usersService.getCurrentUser(user.id);
   }
 
   @Put('user')
   @UseGuards(AuthTokenGuard)
-  updateCurrentUser(
-    @CurrentUser() user: AuthenticatedRequest['user'],
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
-    return this.usersService.updateCurrentUser(
-      requireAuthenticatedUser(user).id,
-      updateUserDto.user,
-    );
+  updateCurrentUser(@RequiredUser() user: AuthenticatedUser, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.updateCurrentUser(user.id, updateUserDto.user);
   }
 }
